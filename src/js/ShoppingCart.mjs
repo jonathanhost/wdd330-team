@@ -1,17 +1,6 @@
 import { getLocalStorage } from "./utils.mjs";
 
-function renderCartContents() {
-  const cartItems = getLocalStorage("so-cart");
-  const htmlItems = cartItems.map((item) => cartItemTemplate(item));
-  document.querySelector(".product-list").innerHTML = htmlItems.join("");
-}
-
 function cartItemTemplate(item) {
-
-  if(item.Image == undefined){
-    item.Image = item.Images.PrimaryMedium
-  }
-  console.log(item)
   const newItem = `<li class="cart-card divider">
   <a href="#" class="cart-card__image">
     <img
@@ -30,4 +19,14 @@ function cartItemTemplate(item) {
   return newItem;
 }
 
-renderCartContents();
+export default class ShoppingCart {
+  constructor(key, parentSelector) {
+    this.key = key;
+    this.parentSelector = parentSelector;
+  }
+  renderCartContents() {
+    const cartItems = getLocalStorage(this.key);
+    const htmlItems = cartItems.map((item) => cartItemTemplate(item));
+    document.querySelector(this.parentSelector).innerHTML = htmlItems.join("");
+  }
+}

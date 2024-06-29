@@ -1,59 +1,59 @@
-import { setLocalStorage } from "./utils.mjs";
+import { setLocalStorage, getLocalStorage } from "./utils.mjs";
+
+function productDetailsTemplate(product) {
+  console.log(product)
+  return `<section class="product-detail"> <h3>${product.Brand.Name}</h3>
+    <h2 class="divider">${product.NameWithoutBrand}</h2>
+    <img
+      class="divider"
+      src="${product.Images.PrimaryLarge}"
+      alt="${product.NameWithoutBrand}"
+    />
+    <p class="product-card__price">$${product.FinalPrice}</p>
+    <p class="product__color">${product.Colors[0].ColorName}</p>
+    <p class="product__description">
+    ${product.DescriptionHtmlSimple}
+    </p>
+    <div class="product-detail__add">
+      <button id="addToCart" data-id="${product.Id}">Add to Cart</button>
+    </div></section>`;
+}
 
 export default class ProductDetails {
-  constructor(productId, dataSource){
+  constructor(productId, dataSource) {
     this.productId = productId;
     this.product = {};
     this.dataSource = dataSource;
   }
   async init() {
-    this.product = await this.dataSource.findProductById(this.productId).then()
-    const product = this.product
-
-
-    
-    const fullname = product.Name;
-    const brand = product.Brand.Name ;
-    const name = product.NameWithoutBrand;
-    const price = product.FinalPrice;
-    const color = product.Colors[0].ColorName;
-    const description = product.DescriptionHtmlSimple;
-    const img = product.Image;
-    const id = product.Id;
-
-    const title = document.querySelector('title');
-    title.innerHTML = 'Sleep Outside | '+fullname
-
-    const details = document.querySelector('.product-detail');
-    const h2 = details.querySelector('h2');
-    const h3 = details.querySelector('h3');
-    h2.innerHTML = name;
-    h3.innerHTML = brand;
-
- 
-    const image = document.querySelector('#product-image');
-    image.src= img;
-    image.alt = "texto";
-
-    const cart_price = document.querySelector('.product-card__price');
-    cart_price.innerHTML = "$"+price
-
-    const product__color = document.querySelector('.product__color');
-    product__color.innerHTML = color;
-
-    const product__description = document.querySelector('.product__description');
-    product__description.innerHTML = description;
-
-
-    const button = document.getElementById('addToCart');
-    button.dataset.id = id;
-
-    document.getElementById('addToCart')
-      .addEventListener('click', this.addToCart.bind(this));
+    // use our datasource to get the details for the current product. findProductById will return a promise! use await or .then() to process it
+    this.product = await this.dataSource.findProductById(this.productId);
+    // once we have the product details we can render out the HTML
+    this.renderProductDetails("main");
+    // once the HTML is rendered we can add a listener to Add to Cart button
+    // Notice the .bind(this). Our callback will not work if we don't include that line. Review the readings from this week on 'this' to understand why.
+    document
+      .getElementById("addToCart")
+      .addEventListener("click", this.addToCart.bind(this));
+     
+  }
+  addToCart() {
+    let cartContents = getLocalStorage("so-cart");
+    //check to see if there was anything there
+    if (!cartContents) {
+      cartContents = [];
     }
-
-    addToCart() {
-      setLocalStorage("so-cart", this.product);
-    }
+    // then add the current product to the list
+    cartContents.push(this.product);
+    setLocalStorage("so-cart", cartContents);
+    window.location.href = "../cart/index.html";
+  }
+  renderProductDetails(selector) {
+    console.log(this.product)
+    const element = document.querySelector(selector);
+    element.insertAdjacentHTML(
+      "afterBegin",
+      productDetailsTemplate(this.product)
+    );
+  }
 }
-
