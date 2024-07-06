@@ -1,8 +1,8 @@
 import { setLocalStorage, getLocalStorage } from "./utils.mjs";
 
 function productDetailsTemplate(product) {
-  console.log(product)
   return `<section class="product-detail"> <h3>${product.Brand.Name}</h3>
+  
     <h2 class="divider">${product.NameWithoutBrand}</h2>
     <img
       class="divider"
@@ -35,7 +35,6 @@ export default class ProductDetails {
     document
       .getElementById("addToCart")
       .addEventListener("click", this.addToCart.bind(this));
-     
   }
   addToCart() {
     let cartContents = getLocalStorage("so-cart");
@@ -49,7 +48,6 @@ export default class ProductDetails {
     window.location.href = "../cart/index.html";
   }
   renderProductDetails(selector) {
-    console.log(this.product)
     const element = document.querySelector(selector);
     element.insertAdjacentHTML(
       "afterBegin",
